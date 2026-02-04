@@ -16,13 +16,58 @@
       <div id="container">
         <strong>Ready to create an app?</strong>
         <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+
+        <ion-button @click="getLocation" expand="block" style="margin-top: 20px;">
+          Get Current Position
+        </ion-button>
+
+        <div v-if="location" style="margin-top: 20px; text-align: left;">
+          <p><strong>Latitude:</strong> {{ location.latitude }}</p>
+          <p><strong>Longitude:</strong> {{ location.longitude }}</p>
+          <p><strong>Accuracy:</strong> {{ location.accuracy }}m</p>
+          <p v-if="location.altitude"><strong>Altitude:</strong> {{ location.altitude }}m</p>
+        </div>
+
+        <div v-if="error" style="margin-top: 20px; color: red;">
+          <p><strong>Error:</strong> {{ error }}</p>
+        </div>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonButton, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { Geolocation } from '@capacitor/geolocation';
+import { ref } from 'vue';
+
+const location = ref<{
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  altitude: number | null;
+} | null>(null);
+
+const error = ref<string | null>(null);
+
+const getLocation = async () => {
+  try {
+    error.value = null;
+    location.value = null;
+
+    const position = await Geolocation.getCurrentPosition();
+
+    location.value = {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      altitude: position.coords.altitude,
+    };
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Failed to get location';
+    console.error('Error getting location:', e);
+  }
+};
 </script>
 
 <style scoped>
