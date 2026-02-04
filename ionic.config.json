@@ -1,0 +1,7 @@
+{
+  "name": "capacitor-geolocation-issue-79",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
